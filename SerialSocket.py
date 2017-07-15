@@ -5,6 +5,7 @@ from serial import Serial, SerialException
 from time import sleep
 import thread
 import re
+import base64
 
 
 OPEN_CONNECTION_STRING = "+++ open port "
@@ -33,7 +34,7 @@ class SerialSocket(WebSocket):
                 self.send("Failed to connect to: " + port + "\n\r")
         else:
             if self.serial.isOpen():
-                self.send(message.data)
+                # self.send(message.data)
                 self.serial.write(message.data)
 
     def close(self, code=1000, reason=''):
@@ -46,10 +47,10 @@ class SerialSocket(WebSocket):
 def serial_poll(serial, socket):
     try:
         while serial.isOpen():
-            data = serial.read(serial.inWaiting())
+            data = base64.b64encode(serial.read(serial.inWaiting()).encode('ascii'))
             if len(data) > 0:
                 # print 'Got:', data
-                data = re.sub("\r", "\n\r", data)
+                # data = re.sub("\r", "\n\r", data)
                 socket.send(data)
             sleep(0.5)
           #  print 'not blocked'
